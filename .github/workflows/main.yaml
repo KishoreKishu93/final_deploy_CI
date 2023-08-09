@@ -21,8 +21,16 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      #- name: Run tests
-        #run: pytest
+      - name: Run tests
+        run: pytest
 
-      - name: Build and deploy
-        run: python app.py
+      - name: Build Docker image
+        run: docker build -t my-flask-app .
+
+      - name: Run Docker container
+        run: docker run -d -p 5000:5000 my-flask-app
+
+      - name: Test Docker deployment
+        run: |
+          sleep 5  # Give the server some time to start
+          curl http://localhost:5000/predict  # Test the deployed endpoint
