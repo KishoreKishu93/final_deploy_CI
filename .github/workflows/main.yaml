@@ -25,7 +25,7 @@ jobs:
        # run: pytest
 
       - name: Build Docker image
-        run: docker build -t my-flask-app .
+        run: docker build --no-cache -t my-flask-app .
 
       - name: Run Docker container
         run: docker run -d -p 5000:5000 my-flask-app
