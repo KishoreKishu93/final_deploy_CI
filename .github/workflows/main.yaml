@@ -21,16 +21,25 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      #- name: Run tests
-       # run: pytest
+      - name: Log in to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: Log in to GitHub Container Registry
+        run: docker login ghcr.io -u ${{ secrets.USERNAME_GIT }} -p ${{ secrets.PAT_GIT }}
 
       - name: Build Docker image
-        run: docker build --no-cache -t my-flask-app .
+        run: docker build -t my-flask-app .
+
+      - name: Tag Docker image for GHCR
+        run: docker tag my-flask-app ghcr.io/${{ github.repository }}/my-flask-app:${{ github.sha }}
+
+      - name: Push Docker image to GHCR
+        run: docker push ghcr.io/${{ github.repository }}/my-flask-app:${{ github.sha }}
 
       - name: Run Docker container
         run: docker run -d -p 5000:5000 my-flask-app
 
       - name: Test Docker deployment
         run: |
-          sleep 5  # Give the server some time to start
-          curl http://localhost:5000/predict  # Test the deployed endpoint
+          sleep 5
+          curl http://localhost:5000/predict
